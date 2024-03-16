@@ -1,5 +1,5 @@
 from django.db import models
-from .resources import AN, ARTICLE
+from .resources import ARTICLE, AN
 from django.contrib.auth.models import User
 from django.db.models import Sum
 from django.urls import reverse
@@ -35,7 +35,7 @@ class Category (models.Model):
 
 class Post (models.Model):
     author = models.ForeignKey('Author', on_delete = models.CASCADE)
-    post_type = models.CharField(max_length=2, choices=AN, default=ARTICLE)
+    post_type = models.CharField(max_length=2, choices= AN, default=ARTICLE)
     datetime_in = models.DateTimeField(auto_now_add = True)
     pcategory = models.ManyToManyField('Category', through='PostCategory')
     title = models.CharField(max_length=128)

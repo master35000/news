@@ -4,7 +4,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from .forms import PostForm
 from django.urls import reverse_lazy
 from .filters import PostFilter
-
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Create your views here.
 
@@ -39,7 +39,8 @@ class NewsDetail (DetailView):
     template_name = 'post.html'
     context_object_name = 'post'
 
-class PostCreate(CreateView):
+class PostCreate(LoginRequiredMixin, CreateView):
+    permission_required = ('news.add_post',)
     form_class = PostForm
     model = Post
     template_name = 'post_edit.html'
@@ -47,12 +48,13 @@ class PostCreate(CreateView):
     def form_valid(self, form):
         post = form.save(commit=False)
         if self.request.path == '/news/create/':
-            post.post_type = 'NW'
+            post.post_type = 'NE'
         post.save()
         return super().form_valid(form)
 
 
-class PostUpdate(UpdateView):
+class PostUpdate(LoginRequiredMixin, UpdateView):
+    permission_required = ('news.change_post',)
     form_class = PostForm
     model = Post
     template_name = 'post_edit.html'
@@ -60,14 +62,15 @@ class PostUpdate(UpdateView):
     def dispatch(self, request, *args, **kwargs ):
         post = self.get_object()
 
-        if self.request.path == f'/posts/news/{post.pk}/edit/' and post.post_type != 'NW':
+        if self.request.path == f'/posts/news/{post.pk}/edit/' and post.post_type != 'NE':
             return render(self.request, 'invalid_news_edit.html')
         elif self.request.path == f'/posts/articles/{post.pk}/edit/' and post.post_type != 'AR':
             return render(self.request, 'invalid_articles_edit.html')
         return super(PostUpdate, self).dispatch(request, *args, **kwargs)
 
 
-class PostDelete(DeleteView):
+class PostDelete(LoginRequiredMixin, DeleteView):
+    permission_required = ('news.delete_post',)
     model = Post
     template_name = 'post_delete.html'
     success_url = reverse_lazy('post_list')
@@ -75,7 +78,7 @@ class PostDelete(DeleteView):
     def dispatch(self, request, *args, **kwargs ):
         post = self.get_object()
 
-        if self.request.path == f'/posts/news/{post.pk}/delete/' and post.post_type != 'NW':
+        if self.request.path == f'/posts/news/{post.pk}/delete/' and post.post_type != 'NE':
             return render(self.request, 'invalid_news_delete.html')
         elif self.request.path == f'/posts/articles/{post.pk}/delete/' and post.post_type != 'AR':
             return render(self.request, 'invalid_articles_delete.html')
