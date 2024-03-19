@@ -11,8 +11,11 @@ Posts
     <h1>Все статьи</h1>
     <hr>
     <h2>Всего статей - {{ posts|length }}</h2>
-    <a href="{% url 'news_create'%}">Новая новость</a>
-    <a href="{% url 'articles_create'%}">Новая статья</a>
+    {% if perms.news.change_post %}
+        <a href="{% url 'news_create'%}">Новая новость</a>
+        <a href="{% url 'articles_create'%}">Новая статья</a>
+    {% endif %}
+
     {% if posts %}
         <table>
             <tr>
@@ -34,10 +37,10 @@ Posts
                 <td>{{ po.post_type }}</td>
                 <td>{{ po.rating }}</td>
                 <td>
-                    {% if po.post_type == 'NE' and perms.news.change_post %}
+                    {% if po.post_type == 'NE' and perms.news.change_post and po.author.user == request.user%}
                        <a href="{% url 'news_update' pk=po.id %}">Изменить</a>
                     {% endif %}
-                    {% if po.post_type == 'AR' and perms.news.change_post %}
+                    {% if po.post_type == 'AR' and perms.news.change_post and po.author.user == request.user%}
                        <a href="{% url 'articles_update' pk=po.id %}">Изменить</a>
                     {% endif %}
 
