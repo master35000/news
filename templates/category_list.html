@@ -8,6 +8,16 @@ Posts
 
 {% block content %}
 
+    {% if is_not_subscriber%}
+        <p class="text-center"><a href="{% url 'subscribe' category.id %}" class="btn-secondary btn-sm">Подписаться</a></p>
+    {% else %}
+        <p class="text-center"><a href="{% url 'unsubscribe' category.id %}" class="btn-secondary btn-sm">Отписаться</a></p>
+    {% endif %}
+
+
+
+
+
     <h1>Все статьи</h1>
     <hr>
     <h2>Всего статей - {{ posts|length }}</h2>
@@ -16,7 +26,7 @@ Posts
         <a href="{% url 'articles_create'%}">Новая статья</a>
     {% endif %}
 
-    {% if posts %}
+    {% if category_news_list %}
         <table>
             <tr>
                 <td>Заголовок</td>
@@ -29,7 +39,7 @@ Posts
                 <td>Действия</td>
             </tr>
 
-            {% for po in posts %}
+            {% for po in category_news_list %}
             <tr>
                 <td>{{ po.title|truncatewords:4|censor }}</td>
                 <td>{{ po.datetime_in|date:'d M Y' }}</td>
@@ -78,3 +88,4 @@ Posts
     {% endif %}
 
 {% endblock content %}
+
