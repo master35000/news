@@ -11,6 +11,7 @@ from django.db.models import Exists, OuterRef
 from django.views.decorators.csrf import csrf_protect
 from .models import PostCategory
 import requests
+from .tasks import send_new_post
 
 # Create your views here.
 
@@ -56,6 +57,7 @@ class PostCreate(LoginRequiredMixin, CreateView):
         if self.request.path == '/posts/news/create/':
             post.post_type = 'NE'
         post.save()
+        send_new_post.delay(post.pk)
         return super().form_valid(form)
 
 
